@@ -23,6 +23,9 @@ app.use(logger('dev'))
 app.use('/auth', authRouter)
 app.use('/test-jwt', testJwtRouter)
 app.use('/users', usersRouter)
+const jeopradyRouter = require("./controllers/jeoprady.js");
+
+app.use("/jeoprady", jeopradyRouter);
 
 
 

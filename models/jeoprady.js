@@ -33,7 +33,7 @@ const questionSchema = new mongoose.Schema(
 );
 
 // Schema for the Jeopardy game
-const gameSchema = new mongoose.Schema(
+const jeopradySchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -54,5 +54,5 @@ const gameSchema = new mongoose.Schema(
 );
 
 
-const Game = mongoose.model('Game', gameSchema);
-module.exports = Game;
+const Jeoprady = mongoose.model('Jeoprady', jeopradySchema);
+module.exports = Jeoprady;
