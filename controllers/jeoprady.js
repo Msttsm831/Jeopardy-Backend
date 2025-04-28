@@ -26,4 +26,14 @@ router.post("/", verifyToken, async (req, res) => {
     }
   });
 
+  router.get("/:jeopradyId", verifyToken, async (req, res) => {
+    try {
+      const jeoprady = await Jeoprady.findById(req.params.jeopradyId).populate("author");
+      res.status(200).json(jeoprady);
+    } catch (err) {
+      res.status(500).json({ err: err.message });
+    }
+  });
+
+
 module.exports = router;
