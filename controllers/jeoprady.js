@@ -78,4 +78,48 @@ router.post("/", verifyToken, async (req, res) => {
     }
   });
 
+
+
+// Add Questions to Jeoprady Game
+router.post("/:jeopradyId/questions", verifyToken, async (req, res) => {
+  try {
+    req.body.author = req.user._id;
+    const jeoprady = await Jeoprady.findById(req.params.jeopradyId);
+
+    if (!jeoprady) {
+      return res.status(404).json({ error: "Jeoprady not found!" });
+    }
+
+    jeoprady.questions.push(req.body);
+    await jeoprady.save();
+
+    const newQuestion = jeoprady.questions[jeoprady.questions.length - 1];
+    newQuestion._doc.author = req.user;
+
+    res.status(201).json(newQuestion);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
+
+// show route for the question
+router.get('/:jeopradyId/questions/:questionId', verifyToken, async (req, res) => {
+  try {
+    const jeoprady = await Jeoprady.findById(req.params.jeopradyId);
+    if (!jeoprady) {
+      return res.status(404).json({ error: 'jeoprady game not found' });
+    }
+    const question = jeoprady.questions.id(req.params.questionId);
+    if (!question) {
+      return res.status(404).json({ error: 'Question not found' });
+    }
+
+    res.status(200).json(question);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 module.exports = router;
