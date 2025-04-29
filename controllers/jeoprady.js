@@ -36,4 +36,46 @@ router.post("/", verifyToken, async (req, res) => {
   });
 
 
+// Edit Jeoprady
+  router.put("/:jeopradyId", verifyToken, async (req, res) => {
+    try {
+      const jeoprady = await Jeoprady.findById(req.params.jeopradyId);
+  
+      if (!jeoprady.author.equals(req.user._id)) {
+        return res.status(403).send("You're not allowed to edit this game!");
+      }
+  
+      const updatedJeoprady = await Jeoprady.findByIdAndUpdate(
+        req.params.jeopradyId,
+        req.body,
+        { new: true }
+      );
+  
+      updatedJeoprady._doc.author = req.user;
+  
+      res.status(200).json(updatedJeoprady);
+    } catch (err) {
+      res.status(500).json({ err: err.message });
+    }
+  });
+
+
+
+  //Delete Jeoprady Game
+  router.delete("/:jeopradyId", verifyToken, async (req, res) => {
+    try {
+      const jeoprady = await Jeoprady.findById(req.params.jeopradyId);
+  
+      if (!jeoprady.author.equals(req.user._id)) {
+        return res.status(403).send("You're not allowed to do that!");
+      }
+
+      const deletedJeoprady = await Jeoprady.findByIdAndDelete(req.params.jeopradyId);
+
+      res.status(200).json(deletedJeoprady);
+    } catch (err) {
+      res.status(500).json({ err: err.message });
+    }
+  });
+
 module.exports = router;
