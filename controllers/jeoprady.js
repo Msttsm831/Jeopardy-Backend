@@ -122,4 +122,36 @@ router.get('/:jeopradyId/questions/:questionId', verifyToken, async (req, res) =
 });
 
 
+//Edit questions added
+router.put("/:jeopradyId/questions/:questionId", verifyToken, async (req, res) => {
+  try {
+    const jeoprady = await Jeoprady.findById(req.params.jeopradyId);
+    if (!jeoprady) {
+      return res.status(404).json({ message: "Jeoprady game not found" });
+    }
+
+    if (jeoprady.author.toString() !== req.user._id) {
+      return res.status(403).json({ message: "Unauthorized to update this question" });
+    }
+
+    const question = jeoprady.questions.id(req.params.questionId);
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    if (req.body.questionText) question.questionText = req.body.questionText;
+    if (req.body.options) question.options = req.body.options;
+    if (req.body.correctAnswer) question.correctAnswer = req.body.correctAnswer;
+    if (req.body.points) question.points = req.body.points;
+    if (req.body.category) question.category = req.body.category;
+
+    await jeoprady.save();
+    res.status(200).json({ message: "Question updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 module.exports = router;
