@@ -28,7 +28,7 @@ router.post("/", verifyToken, async (req, res) => {
 
   router.get("/:jeopradyId", verifyToken, async (req, res) => {
     try {
-      const jeoprady = await Jeoprady.findById(req.params.jeopradyId).populate("author");
+      const jeoprady = await Jeoprady.findById(req.params.jeopradyId).populate("author")
       res.status(200).json(jeoprady);
     } catch (err) {
       res.status(500).json({ err: err.message });
@@ -151,6 +151,33 @@ router.put("/:jeopradyId/questions/:questionId", verifyToken, async (req, res) =
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
+router.delete("/:jeopradyId/questions/:questionId", verifyToken, async (req, res) => {
+  try {
+    // Find the Jeoprady document by ID
+    const jeoprady = await Jeoprady.findById(req.params.jeopradyId);
+    if (!jeoprady) {
+      return res.status(404).json({ message: "Jeoprady game not found" });
+    }
+
+    // Check if the authenticated user is the author of the Jeoprady game
+    if (jeoprady.author.toString() !== req.user._id) {
+      return res.status(403).json({ message: "You are not authorized to delete this question" });
+    }
+
+    await Jeoprady.updateOne(
+      { _id: req.params.jeopradyId },
+      { $pull: { questions: { _id: req.params.questionId } } }
+    );
+
+    res.status(200).json({ message: "Question deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 
 
